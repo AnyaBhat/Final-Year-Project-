@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@1,8..60,600&display=swap"
+        rel="stylesheet">
+    <title>Kannada Character Prediction</title>
+</head>
+
+<body>
+
+    <div class="topnav" id="myTopnav">
+        <a href="#" id="logo">
+            AksharaNetra
+        </a>
+        <a href="#home" class="active">Home</a>
+        <a href="about.html">About</a>
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+
+    <div class="content-box">
+        <div>
+            <h1>Kannada Character Prediction</h1>
+
+            <label for="imageInput">Upload Single character Image:</label>
+            <input type="file" id="imageInput" accept="image/*" onchange="displayImage(this)">
+
+            <button onclick="predictCharacter()">Predict Character</button>
+
+            <div class="or-text">OR</div>
+            
+            <label for="labeledImageInput">Click to see Mapping of test data and predicted data</label>
+
+            <button onclick="displayCSV()">Test Accuracy</button>
+
+
+
+            <div class="or-text">OR</div>
+
+            <label for="labeledImageInput">Upload document Image:</label>
+            <input type="file" id="labeledImageInput" accept="image/*" onchange="displayImage(this)">
+
+            <button onclick="predictLabeled()">Predict Document</button>
+            <button onclick="optimizeDocument()">Optimise output</button>
+
+            <img id="uploadedImage" src=" " alt="Uploaded Image">
+            <div id="heading"></div>
+            <div id="output"></div>
+            <!-- Table to display CSV content -->
+            <table id="csvTable" border="1">
+                <!-- Table content will be added here dynamically -->
+            </table>
+        </div>
+
+        <footer>
+            &copy; 2023 Kannada Character Prediction
+        </footer>
+    </div>
+    <script>
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+            document.getElementById('heading').innerHTML = '';
+            document.getElementById('uploadedImage').src = '';
+            clearTable();
+        }
+        function clearHead() {
+            document.getElementById('heading').innerHTML = '';
+            clearTable();
+        }
+
+        function clearTable() {
+            var table = document.getElementById('csvTable');
+            table.innerHTML = '';
+        }
+
+        function displayImage(input) {
+            clearTable();
+            var file = input.files[0];
+
+            if (file) {
+                var imgElement = document.getElementById('uploadedImage');
+                imgElement.src = URL.createObjectURL(file);
+                imgElement.style.display = 'block';
+            }
+        }
+
+        function predictCharacter() {
+            clearTable();
+            var input = document.getElementById('imageInput');
+            var file = input.files[0];
+
+            if (file) {
+
+                var formData = new FormData();
+                formData.append('image', file);
+
+                fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        document.getElementById('output').innerText = `Predicted Character: ${data.predicted_char} \n Predicted Class: ${data.predicted_class} \n Confidence Level: ${data.confidence_level * 100}`;
+                    })
+                    .catch(error => console.error('Error:', error));
+
+            } else {
+                alert('Please select an image file.');
+            }
+        }
+
+        function predictLabeled() {
+            clearTable()
+
+            var labeledInput = document.getElementById('labeledImageInput');
+            var labeledFile = labeledInput.files[0];
+
+            if (labeledFile) {
+
+                var formData = new FormData();
+                formData.append('image', labeledFile);
+
+                fetch('http://127.0.0.1:5000/predict_labeled', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        document.getElementById('heading').innerText = ` \t\t\tPredicted Text:\n`;
+                        document.getElementById('output').innerText = ` ${data.predicted_text}`;
+                    })
+                    .catch(error => console.error('Error:', error));
+
+            } else {
+                alert('Please select a labeled image file.');
+            }
+        }
+        function optimizeDocument() {
+            // Get the content from the #output textarea
+            clearHead();
+            const inputText = document.getElementById("output").innerText;
+
+            // Make a POST request to the Kannada Words Correcter API
+            fetch('https://kannada-words-correcter.onrender.com/autocorrect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'sentence': inputText,
+                }),
+            })
+                .then(response => {
+                    console.log('Response Status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${ response.status }`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API Response:', data);
+
+                    // Check if the response contains the expected data
+                    if (data && data.corrected_sentence && data.original_sentence) {
+                        // Display the corrected sentence in the #output textarea
+                        document.getElementById("output").innerText = `Original Sentence: ${ data.original_sentence } \n Corrected Sentence: ${ data.corrected_sentence }`;
+                    } else {
+                        console.error('Invalid response format:', data);
+                        // Handle unexpected response format
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle errors as needed
+                });
+        }
+
+
+        function myFunction() {
+            var x = document.getElementById("myTopnav");
+            if (x.className === "topnav") {
+                x.className += " responsive";
+            } else {
+                x.className = "topnav";
+            }
+        }
+
+        // Function to display CSV content in a table
+        function displayCSV() {
+            clearOutput();
+            clearHead();
+
+            var totalRows = 0;
+            var sameValuesRows = 0;
+
+            // Fetch the CSV file with a relative path
+            fetch('Model/predicted_vs_actual_sample.csv')  // Adjust the path based on your file structure
+                .then(response => response.text())
+                .then(csvData => {
+                    // Split CSV data into rows
+                    var rows = csvData.split('\n');
+
+                    // Get the table element
+                    var table = document.getElementById('csvTable');
+
+                    // Clear existing table content
+                    table.innerHTML = '';
+
+                    // Iterate over rows and add them to the table
+                    rows.forEach(row => {
+                        var cells = row.split(',');
+                        var newRow = table.insertRow();
+                        totalRows++;
+
+                        // Check if column 1 and column 2 have the same values
+                        if (cells.length >= 2 && cells[0].trim() === cells[1].trim()) {
+                            sameValuesRows++;
+                        }
+                        cells.forEach(cell => {
+                            var newCell = newRow.insertCell();
+                            newCell.textContent = cell;
+                        });
+                    });
+
+                    // Update the output
+                    document.getElementById('output').innerHTML = `Test Accuracy: ${(sameValuesRows * 100) / totalRows}%`;
+                })
+                .catch(error => console.error('Error:', error));
+            // Clear the uploaded image and output
+            document.getElementById('uploadedImage').value = ''; // Reset the input field
+        }
+
+    </script>
+</body>
+
+</html>

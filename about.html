@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@1,8..60,600&display=swap"
+        rel="stylesheet">
+    <title>Kannada Character Prediction</title>
+</head>
+
+<body>
+    <div class="topnav" id="myTopnav">
+        <a href="#" id="logo" >
+            AksharaNetra
+        </a>
+        <a href="index.html">Home</a>
+        <a href="#about" class="active">About</a>
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+    <div class="content-box">
+        <h1>About</h1>
+        <ul>Kannada, a vibrant Dravidian language spoken predominantly in the southern Indian state of Karnataka, boasts
+            a rich linguistic and cultural heritage. With its origins deeply rooted in ancient history, Kannada has
+            evolved into a modern language with a distinctive script. The Kannada script, derived from the Brahmi
+            script, is an abugida system, employing characters that represent consonant-vowel syllables. Each consonant
+            carries an inherent "a" vowel sound, and diacritic marks are utilized to modify the vowel or represent
+            standalone consonants. The script's directional flow is left to right, and it encompasses consonant
+            conjuncts and vowel diacritics, allowing for a versatile representation of sounds. The Kannada script is not
+            only a means of written communication but also an integral part of Karnataka's cultural identity, featured
+            in ancient inscriptions, literature, and contemporary digital platforms. It serves as a testament to the
+            enduring linguistic and cultural legacy of the Kannada-speaking people.</ul>
+        <img src="front_end\letters.jpg" alt="Kannada Letters" class="letters">
+        <img src="front_end\numbers.gif" alt="Kannada Numbers" class="num">
+        <ul>This handwritten character recognition project mainly focuses on the task of recognizing the handwritten
+            documents commonly found in state’s government officials and healthcare departments of the state
+            Karnataka.Since manually converting these documents into digital format is a tedious task and it consumes
+            more time and also it would be very difficult to reproduce the contents of these old documents which becomes
+            difficult to read and understand, Hence in this recent research fields of study the handwritten character
+            recognition(HCR) is used to recognize the characters from the image that is given as the input source and
+            predicts the Kannada character as the output. So, the neural network approach is used for better performance
+            and accuracy. </ul>
+        <footer>
+            &copy; 2023 Kannada Character Prediction
+        </footer>
+    </div>
+    <script>
+
+        function myFunction() {
+            var x = document.getElementById("myTopnav");
+            if (x.className === "topnav") {
+                x.className += " responsive";
+            } else {
+                x.className = "topnav";
+            }
+        }
+    </script>
+</body>
+
+</html>
